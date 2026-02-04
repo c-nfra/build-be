@@ -29,6 +29,10 @@ inputs:
     description: 'Path to the Dockerfile'
     required: false
     default: './'
+  dockerfile-name:
+    description: 'Name of Dockerfile'
+    required: false
+    default: 'Dockerfile'
   docker-context-folder:
     description: 'Path to Docker context'
     required: false
@@ -136,13 +140,14 @@ runs:
       run: |
         docker build $BUILD_ARGS \
           -t ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG} \
-          -f ${GITHUB_WORKSPACE}/${DOCKER_PATH}/Dockerfile ${GITHUB_WORKSPACE}/${DOCKER_CONTEXT_FOLDER}
+          -f ${GITHUB_WORKSPACE}/${DOCKER_PATH}/${DOCKERFILE_NAME} ${GITHUB_WORKSPACE}/${DOCKER_CONTEXT_FOLDER}
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:${IMAGE_TAG}
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ inputs.ecr-repository }}
         IMAGE_TAG: ${{ steps.set-tag.outputs.image-tag }}
         DOCKER_PATH: ${{ inputs.docker-path }}
+        DOCKERFILE_NAME: ${{ inputs.dockerfile-name }}
         DOCKER_CONTEXT_FOLDER: ${{ inputs.docker-context-folder }}
         BUILD_ARGS: ${{ steps.set-envs.outputs.build-args }}
       shell: bash
